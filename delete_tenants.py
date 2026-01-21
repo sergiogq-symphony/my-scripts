@@ -2,7 +2,7 @@ import requests
 import json
 import argparse
 
-def get_and_filter_tenants(url, ignored_tenant_ids):
+def get_and_filter_tenants(url, ignored_tenant_ids, filter_label="phx-"):
     phx_tenant_ids = []
     try:
         response = requests.get(url)
@@ -15,7 +15,7 @@ def get_and_filter_tenants(url, ignored_tenant_ids):
                "vanityName" in tenant["properties"] and \
                tenant_id not in ignored_tenant_ids:
                 vanity_name = tenant["properties"]["vanityName"]
-                if vanity_name is not None and vanity_name.startswith("phx-"):
+                if vanity_name is not None and vanity_name.startswith(filter_label):
                     phx_tenant_ids.append(tenant_id)
 
     except requests.exceptions.RequestException as e:
@@ -53,7 +53,9 @@ if __name__ == "__main__":
         "1300", "1381", "1382", "1136"
     ]
 
-    phx_tenant_ids = get_and_filter_tenants(url, ignored_tenant_ids)
+    filter_label = "phx-"
+
+    phx_tenant_ids = get_and_filter_tenants(url, ignored_tenant_ids, filter_label)
     
     if phx_tenant_ids:
         print(f"Found {len(phx_tenant_ids)} tenants to delete.")
